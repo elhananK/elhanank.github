@@ -163,10 +163,9 @@ var AppComponent = (function () {
             }
             _this.subscriptions.push(_this.bService.AddBook(response).subscribe(function () {
                 if (isNew) {
-                    _this.allBooks = _this.allBooks.concat([response]);
-                    // this.allBooks = [response, ...this.allBooks];
-                    // this.booksForCurrentPage.pop();
-                    // this.booksForCurrentPage = [response , ...this.booksForCurrentPage];
+                    _this.allBooks = [response].concat(_this.allBooks);
+                    _this.booksForCurrentPage.pop();
+                    _this.booksForCurrentPage = [response].concat(_this.booksForCurrentPage);
                 }
                 else {
                     _this.allBooks[response.id - 1] = response;
@@ -324,7 +323,7 @@ module.exports = module.exports.toString();
 /***/ "../../../../../src/app/components/book-card/book-card.component.html":
 /***/ (function(module, exports) {
 
-module.exports = "  <mat-card class=\"example-card\">\n      <mat-card-header>\n        <div mat-card-avatar class=\"example-header-image\"></div>\n        <mat-card-title>{{book.title | capitalize }}</mat-card-title>\n        <mat-card-subtitle>{{book.author}}</mat-card-subtitle>\n        <mat-card-subtitle>{{ book.date | date:'dd/MM/yyyy' }}</mat-card-subtitle>\n      </mat-card-header>\n      <img class=\"img-book\" mat-card-image src={{book.imageUrl}} alt={{book.title}}>\n      <mat-card-content>\n        <p>\n            {{book.description}}\n        </p>\n      </mat-card-content>\n      <mat-card-actions>\n        <button mat-button (click)=\"editBook()\" >Edit</button>\n        <button mat-button (click)=\"deleteBook()\">Delete</button>\n      </mat-card-actions>\n    </mat-card>"
+module.exports = "  <mat-card class=\"example-card\">\n      <mat-card-header>\n        <div mat-card-avatar class=\"example-header-image\"></div>\n        <mat-card-title>{{book.title | capitalize }}</mat-card-title>\n        <mat-card-subtitle>{{book.author}}</mat-card-subtitle>\n        <mat-card-subtitle>{{ book.date | date:'dd/MM/yyyy' }}</mat-card-subtitle>\n      </mat-card-header>\n      <img class=\"img-book\" mat-card-image src={{book.imageUrl}} alt=\"No Image Found\">\n      <mat-card-content>\n        <p>\n            {{book.description}}\n        </p>\n      </mat-card-content>\n      <mat-card-actions>\n        <button mat-button (click)=\"editBook()\" >Edit</button>\n        <button mat-button (click)=\"deleteBook()\">Delete</button>\n      </mat-card-actions>\n    </mat-card>"
 
 /***/ }),
 
@@ -626,9 +625,11 @@ var BooksService = (function () {
         this.http = http;
     }
     BooksService.prototype.GetAll = function () {
+        var _this = this;
         return this.http
             .get('api/books')
             .map(function (response) {
+            _this.allBooks = response;
             return response;
         });
     };
@@ -752,8 +753,7 @@ var DuplicateTitleValidatorDirective = DuplicateTitleValidatorDirective_1 = (fun
             }
             var bookWithGivenTitle = books.find(function (book) { return book.title === control.value; });
             // if not found a book with the same title then the value is valid
-            // if (!bookWithGivenTitle || !(originalBookTitle === control.value) {
-            if (!bookWithGivenTitle || originalBookTitle === control.value) {
+            if (!bookWithGivenTitle || !(originalBookTitle === control.value)) {
                 return null;
             }
             return {
